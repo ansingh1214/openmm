@@ -76,6 +76,7 @@ __kernel void computeNonbonded(
                 real r = r2*invR;
                 LOAD_ATOM2_PARAMETERS
                 atom2 = y*TILE_SIZE+j;
+                real dEdR_NC = 0;
 #ifdef USE_SYMMETRIC
                 real dEdR = 0;
 #else
@@ -90,6 +91,9 @@ __kernel void computeNonbonded(
                 COMPUTE_INTERACTION
                 energy += 0.5f*tempEnergy;
 #ifdef INCLUDE_FORCES
+                force.x += dEdR_NC;
+                force.y += dEdR_NC;
+                force.z += dEdR_NC;
 #ifdef USE_SYMMETRIC
                 force.xyz -= delta.xyz*dEdR;
 #else
@@ -135,6 +139,7 @@ __kernel void computeNonbonded(
                     real r = r2*invR;
                     LOAD_ATOM2_PARAMETERS
                     atom2 = y*TILE_SIZE+tj;
+                    real dEdR_NC = 0;
 #ifdef USE_SYMMETRIC
                     real dEdR = 0;
 #else
@@ -149,6 +154,13 @@ __kernel void computeNonbonded(
                     COMPUTE_INTERACTION
                     energy += tempEnergy;
 #ifdef INCLUDE_FORCES
+
+                force.x += dEdR_NC;
+                force.y += dEdR_NC;
+                force.z += dEdR_NC;
+                localData[tbx+tj].fx += dEdR_NC;
+                localData[tbx+tj].fy += dEdR_NC;
+                localData[tbx+tj].fz += dEdR_NC;
 #ifdef USE_SYMMETRIC
                     delta.xyz *= dEdR;
                     force.xyz -= delta.xyz;
@@ -311,6 +323,7 @@ __kernel void computeNonbonded(
                         real r = r2*invR;
                         LOAD_ATOM2_PARAMETERS
                         atom2 = atomIndices[tbx+tj];
+                        real dEdR_NC = 0;
 #ifdef USE_SYMMETRIC
                         real dEdR = 0;
 #else
@@ -325,6 +338,13 @@ __kernel void computeNonbonded(
                         COMPUTE_INTERACTION
                         energy += tempEnergy;
 #ifdef INCLUDE_FORCES
+
+                force.x += dEdR_NC;
+                force.y += dEdR_NC;
+                force.z += dEdR_NC;
+                localData[tbx+tj].fx += dEdR_NC;
+                localData[tbx+tj].fy += dEdR_NC;
+                localData[tbx+tj].fz += dEdR_NC;
 #ifdef USE_SYMMETRIC
                         delta.xyz *= dEdR;
                         force.xyz -= delta.xyz;
@@ -366,6 +386,7 @@ __kernel void computeNonbonded(
                         real r = r2*invR;
                         LOAD_ATOM2_PARAMETERS
                         atom2 = atomIndices[tbx+tj];
+                        real dEdR_NC = 0;
 #ifdef USE_SYMMETRIC
                         real dEdR = 0;
 #else
@@ -380,6 +401,13 @@ __kernel void computeNonbonded(
                         COMPUTE_INTERACTION
                         energy += tempEnergy;
 #ifdef INCLUDE_FORCES
+
+                force.x += dEdR_NC;
+                force.y += dEdR_NC;
+                force.z += dEdR_NC;
+                localData[tbx+tj].fx += dEdR_NC;
+                localData[tbx+tj].fy += dEdR_NC;
+                localData[tbx+tj].fz += dEdR_NC;
 #ifdef USE_SYMMETRIC
                         delta.xyz *= dEdR;
                         force.xyz -= delta.xyz;

@@ -48,7 +48,8 @@
 #include <set>
 #include <sstream>
 #include <typeinfo>
-
+#include <iostream>
+#include <fstream>
 using namespace OpenMM;
 using namespace std;
 
@@ -622,6 +623,12 @@ cl::Program OpenCLContext::createProgram(const string source, const map<string, 
     src << source << endl;
     cl::Program::Sources sources({src.str()});
     cl::Program program(context, sources);
+    //
+        ofstream f;
+        f.open("/Users/aditya1214/Documents/openmm/cl_source.cpp");
+        f << src.str();
+        f.close();
+    //
     try {
         program.build(vector<cl::Device>(1, device), options.c_str());
     } catch (cl::Error err) {

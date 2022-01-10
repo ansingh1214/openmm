@@ -48,7 +48,7 @@ using std::stringstream;
 using std::vector;
 
 CustomNonbondedForce::CustomNonbondedForce(const string& energy) : energyExpression(energy), nonbondedMethod(NoCutoff), cutoffDistance(1.0),
-    switchingDistance(-1.0), useSwitchingFunction(false), useLongRangeCorrection(false) {
+    switchingDistance(-1.0), useSwitchingFunction(false), useLongRangeCorrection(false), isNC(false) {
 }
 
 CustomNonbondedForce::CustomNonbondedForce(const CustomNonbondedForce& rhs) {
@@ -305,6 +305,10 @@ void CustomNonbondedForce::setInteractionGroupParameters(int index, const std::s
         ASSERT_VALID_INDEX(*it, particles);
     interactionGroups[index].set1 = set1;
     interactionGroups[index].set2 = set2;
+}
+
+void CustomNonbondedForce::setNC(){
+    isNC = true;
 }
 
 ForceImpl* CustomNonbondedForce::createImpl() const {

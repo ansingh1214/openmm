@@ -31,7 +31,7 @@ force.setNonbondedMethod(CustomNonbondedForce.CutoffPeriodic)
 force.setCutoffDistance(2) 
 force.setNC()
 force.setForceGroup(1)
-print(force.getIsNC()) // returns True
+print(force.getIsNC()) # returns True
 system.addForce(force)
 
 platform   = openmm.Platform.getPlatformByName("OpenCL")

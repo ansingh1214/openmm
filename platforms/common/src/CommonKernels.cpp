@@ -1928,9 +1928,15 @@ void CommonCalcCustomNonbondedForceKernel::initialize(const System& system, cons
     bool usePeriodic = (force.getNonbondedMethod() != CustomNonbondedForce::NoCutoff && force.getNonbondedMethod() != CustomNonbondedForce::CutoffNonPeriodic);
     Lepton::ParsedExpression energyExpression = Lepton::Parser::parse(force.getEnergyFunction(), functions).optimize();
     Lepton::ParsedExpression forceExpression = energyExpression.differentiate("r").optimize();
+    if (force.getIsNC())
+        forceExpression = Lepton::Parser::parse(force.getEnergyFunction(), functions).optimize();
+
     map<string, Lepton::ParsedExpression> forceExpressions;
     forceExpressions["real customEnergy = "] = energyExpression;
-    forceExpressions["tempForce -= "] = forceExpression;
+    if (force.getIsNC())
+        forceExpressions["dEdR_NC += "]   = forceExpression;
+    else
+        forceExpressions["tempForce -= "] = forceExpression;
 
     // Create the kernels.
 

@@ -511,6 +511,13 @@ public:
     bool usesPeriodicBoundaryConditions() const {
         return nonbondedMethod == CustomNonbondedForce::CutoffPeriodic;
     }
+
+    bool getIsNC() const {
+        return isNC;
+    }
+
+    void setNC();
+ 
 protected:
     ForceImpl* createImpl() const;
 private:
@@ -523,7 +530,7 @@ private:
     class InteractionGroupInfo;
     NonbondedMethod nonbondedMethod;
     double cutoffDistance, switchingDistance;
-    bool useSwitchingFunction, useLongRangeCorrection;
+    bool useSwitchingFunction, useLongRangeCorrection, isNC;
     std::string energyExpression;
     std::vector<PerParticleParameterInfo> parameters;
     std::vector<GlobalParameterInfo> globalParameters;

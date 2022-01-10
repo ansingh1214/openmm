@@ -171,6 +171,7 @@ extern "C" __global__ void computeNonbonded(
                 real r = r2*invR;
                 LOAD_ATOM2_PARAMETERS
                 atom2 = y*TILE_SIZE+j;
+                real dEdR_NC = 0.0f;
 #ifdef USE_SYMMETRIC
                 real dEdR = 0.0f;
 #else
@@ -185,6 +186,9 @@ extern "C" __global__ void computeNonbonded(
                 COMPUTE_INTERACTION
                 energy += 0.5f*tempEnergy;
 #ifdef INCLUDE_FORCES
+                force.x += dEdR_NC;
+                force.y += dEdR_NC;
+                force.z += dEdR_NC;
 #ifdef USE_SYMMETRIC
                 force.x -= delta.x*dEdR;
                 force.y -= delta.y*dEdR;
@@ -240,6 +244,7 @@ extern "C" __global__ void computeNonbonded(
                 real r = r2*invR;
                 LOAD_ATOM2_PARAMETERS
                 atom2 = y*TILE_SIZE+tj;
+                real dEdR_NC = 0.0f;
 #ifdef USE_SYMMETRIC
                 real dEdR = 0.0f;
 #else
@@ -254,6 +259,19 @@ extern "C" __global__ void computeNonbonded(
                 COMPUTE_INTERACTION
                 energy += tempEnergy;
 #ifdef INCLUDE_FORCES
+                force.x += dEdR_NC;
+                force.y += dEdR_NC;
+                force.z += dEdR_NC;
+#ifdef ENABLE_SHUFFLE 
+                shflForce.x += dEdR_NC;
+                shflForce.y += dEdR_NC;
+                shflForce.z += dEdR_NC;
+
+#else
+                localData[tbx+tj].fx += dEdR_NC;
+                localData[tbx+tj].fy += dEdR_NC;
+                localData[tbx+tj].fz += dEdR_NC;
+#endif
 #ifdef USE_SYMMETRIC
                 delta *= dEdR;
                 force.x -= delta.x;
@@ -446,6 +464,7 @@ extern "C" __global__ void computeNonbonded(
                     real r = r2*invR;
                     LOAD_ATOM2_PARAMETERS
                     atom2 = atomIndices[tbx+tj];
+                    real dEdR_NC = 0.0f;
 #ifdef USE_SYMMETRIC
                     real dEdR = 0.0f;
 #else
@@ -460,6 +479,19 @@ extern "C" __global__ void computeNonbonded(
                     COMPUTE_INTERACTION
                     energy += tempEnergy;
 #ifdef INCLUDE_FORCES
+                force.x += dEdR_NC;
+                force.y += dEdR_NC;
+                force.z += dEdR_NC;
+#ifdef ENABLE_SHUFFLE 
+                shflForce.x += dEdR_NC;
+                shflForce.y += dEdR_NC;
+                shflForce.z += dEdR_NC;
+
+#else
+                localData[tbx+tj].fx += dEdR_NC;
+                localData[tbx+tj].fy += dEdR_NC;
+                localData[tbx+tj].fz += dEdR_NC;
+#endif
 #ifdef USE_SYMMETRIC
                     delta *= dEdR;
                     force.x -= delta.x;
@@ -517,6 +549,7 @@ extern "C" __global__ void computeNonbonded(
                     real r = r2*invR;
                     LOAD_ATOM2_PARAMETERS
                     atom2 = atomIndices[tbx+tj];
+					real dEdR_NC = 0.0f;
 #ifdef USE_SYMMETRIC
                     real dEdR = 0.0f;
 #else
@@ -531,6 +564,19 @@ extern "C" __global__ void computeNonbonded(
                     COMPUTE_INTERACTION
                     energy += tempEnergy;
 #ifdef INCLUDE_FORCES
+                force.x += dEdR_NC;
+                force.y += dEdR_NC;
+                force.z += dEdR_NC;
+#ifdef ENABLE_SHUFFLE 
+                shflForce.x += dEdR_NC;
+                shflForce.y += dEdR_NC;
+                shflForce.z += dEdR_NC;
+
+#else
+                localData[tbx+tj].fx += dEdR_NC;
+                localData[tbx+tj].fy += dEdR_NC;
+                localData[tbx+tj].fz += dEdR_NC;
+#endif
 #ifdef USE_SYMMETRIC
                     delta *= dEdR;
                     force.x -= delta.x;
@@ -620,6 +666,7 @@ extern "C" __global__ void computeNonbonded(
         real r2 = delta.x*delta.x + delta.y*delta.y + delta.z*delta.z;
         real invR = RSQRT(r2);
         real r = r2*invR;
+        real dEdR_NC = 0.0f;
 #ifdef USE_SYMMETRIC
         real dEdR = 0.0f;
 #else
@@ -637,6 +684,13 @@ extern "C" __global__ void computeNonbonded(
         real3 dEdR1 = delta*dEdR;
         real3 dEdR2 = -dEdR1;
 #endif
+		dEdR1.x -= dEdR_NC;
+		dEdR1.y -= dEdR_NC;
+		dEdR1.z -= dEdR_NC;
+		dEdR2.x -= dEdR_NC;
+		dEdR2.y -= dEdR_NC;
+		dEdR2.z -= dEdR_NC;
+
         atomicAdd(&forceBuffers[atom1], static_cast<unsigned long long>((long long) (-dEdR1.x*0x100000000)));
         atomicAdd(&forceBuffers[atom1+PADDED_NUM_ATOMS], static_cast<unsigned long long>((long long) (-dEdR1.y*0x100000000)));
         atomicAdd(&forceBuffers[atom1+2*PADDED_NUM_ATOMS], static_cast<unsigned long long>((long long) (-dEdR1.z*0x100000000)));
